@@ -4,7 +4,9 @@ import random
 import datetime
 import numpy as np
 
-random.seed(2)
+# random.seed(2)
+random.seed(1031)
+
 class Toplogic():
     def __init__(self, Age, Industry):
         self.Age = Age
@@ -67,10 +69,12 @@ def Norm_Game(Agents):
         if s < b:
             Agents[u].Score += 3
             for y in range(len(Agents)):
+                # only can be seen by their neighbors
                 if y != u and Agents[y].Neighbors == Agents[u].Neighbors:
                     Agents[y].Score += -1
                     if s < Agents[y].Vengefulness:
-                        Agents[u].Score += -9
+                        # Agents[u].Score += -9
+                        Agents[u].Score += -2
                         Agents[y].Score += -2
     return Agents
 
@@ -141,8 +145,8 @@ def Mutation(Agents):
             Agents[i].Vengefulness = Prob_Veng
 
 # 模型参数
-NumExp = 10
-epoch = 100
+NumExp = 100
+epoch = 1000
 NumAgent = 25
 
 #################
@@ -181,28 +185,29 @@ for i in range(NumExp):
     Z.append(z)
     # U.append(u)
 
-    x = []
-    for i in range( epoch ):
-        gen = [e[i] for e in X]
-        x.append( np.mean( gen ) )
-    fig, ax = plt.subplots()
-    ax.plot( x, color='red', label='mean' )
-    plt.title("Average Score in each epoch")
-    plt.xlabel( "Time" )
-    plt.ylabel( "Value" )
-    plt.legend()
-    plt.yticks( [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1] )
-    plt.xlim( [0.0, epoch] )
-    plt.savefig( "Norm Game" )
-    plt.show()
+    # x = []
+    # for i in range( epoch ):
+    #     gen = [e[i] for e in X]
+    #     x.append( np.mean( gen ) )
+    # fig, ax = plt.subplots()
+    # ax.plot( x, color='red', label='mean' )
+    # plt.title("Average Score in each epoch")
+    # plt.xlabel( "Time" )
+    # plt.ylabel( "Value" )
+    # plt.legend()
+    # plt.yticks( [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1] )
+    # plt.xlim( [0.0, epoch] )
+    # plt.savefig( "Norm Game" )
+    # plt.show()
 
 # Axelrod 基本图
+fig, ax = plt.subplots()
 plt.xlabel("Boldness")
 plt.ylabel("Vengefulness")
 plt.title('Norm Game Dynamics')
 plt.ylim([0.0, 1.0])
 plt.xlim([0.0, 1.0])
-plt.plot([np.mean(u) for u in Vengefulness_end], [np.mean(u) for u in Boldness_end], 'D', color='red')
+plt.plot([np.mean(u) for u in Vengefulness_end], [np.mean(u) for u in Boldness_end], 'D', c='blue')
 plt.savefig("Norm_Game_Dynamics.png")
 plt.show()
 
@@ -227,9 +232,20 @@ for i in range(epoch):
     gen = [e[i] for e in U]
     u.append(np.mean(gen))
 
+
 # 画图
 fig, ax = plt.subplots()
+ax.plot( x, color='red', label='mean' )
+plt.title( "Average Score in each epoch" )
+plt.xlabel( "Time" )
+plt.ylabel( "Value" )
+plt.legend()
+plt.yticks( [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1] )
+plt.xlim( [0.0, epoch] )
+plt.savefig( "Average Score" )
+plt.show()
 
+fig, ax = plt.subplots()
 ax.plot(z, color='grey', label='Boldness')
 ax.plot(y, color='black', label='Vengefulness')
 
@@ -237,17 +253,6 @@ plt.xlabel("Time")
 plt.ylabel("Value")
 plt.legend()
 plt.ylim([0.0, 1.0])
-plt.yticks([0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1])
-plt.xlim([0.0, epoch])
-plt.savefig("Norm Game")
-plt.show()
-
-fig, ax = plt.subplots()
-ax.plot(x, color='red', label='mean')
-
-plt.xlabel("Time")
-plt.ylabel("Value")
-plt.legend()
 plt.yticks([0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1])
 plt.xlim([0.0, epoch])
 plt.savefig("Norm Game")
