@@ -19,8 +19,8 @@ class Jugadores():
 # print agents
 def Imprimir_Jugador(j, Personas):
     print("Score: " + str( Personas[j].Score ))
-    print("Boldness: " + str( Personas[j].Boldness ))
-    print("Vengefulness: " + str( Personas[j].Vengefulness ))
+    print("Boldness: " + str( Personas[j].Competitiveness ) )
+    print("Vengefulness: " + str( Personas[j].Resistance ) )
 
 def Iteraction(Poblacion):
     Corrompe_norma = []
@@ -28,14 +28,14 @@ def Iteraction(Poblacion):
         # 我们给每个居民4次不符合标准的机会
         for k in range(0, 4):
             s = random.uniform(0, 1)
-            b = Poblacion[u].Boldness
+            b = Poblacion[u].Competitiveness
             if s < b:
                 Poblacion[u].Score += 3
                 Corrompe_norma.append(0)
                 for y in range(len(Poblacion)):
                     if y != u:
                         Poblacion[y].Score += -1
-                        if s < Poblacion[y].Vengefulness:
+                        if s < Poblacion[y].Resistance:
                             Poblacion[u].Score += -9
                             Poblacion[y].Score += -2
             else:
@@ -68,8 +68,8 @@ def Experimento():
 
         Scores.append([u.Score for u in Personas])
         # print "i: " + str(y) + " Scores: ", Scores
-        Boldness_1.append( [u.Boldness for u in Personas] )
-        Vengefulness_1.append( [u.Vengefulness for u in Personas] )
+        Boldness_1.append( [u.Competitiveness for u in Personas] )
+        Vengefulness_1.append( [u.Resistance for u in Personas] )
         Corrompe_norma_1.append( aux ) # Norm
 
         # 找到分数的平均值及其标准偏差
@@ -89,10 +89,10 @@ def Experimento():
         for i in range(len(Personas)):
             x = (Personas[i].Score - M) / std_deviation
             if Personas[i].Score >= M + 1 * std_deviation:
-                Personas_nuevas.append(Jugadores(0, Personas[i].Boldness, Personas[i].Vengefulness))
-                Personas_nuevas.append(Jugadores( 0, Personas[i].Boldness, Personas[i].Vengefulness ) )
+                Personas_nuevas.append( Jugadores( 0, Personas[i].Competitiveness, Personas[i].Resistance ) )
+                Personas_nuevas.append( Jugadores( 0, Personas[i].Competitiveness, Personas[i].Resistance ) )
             elif Personas[i].Score >= M and Personas[i].Score < M + 1 * std_deviation:
-                Personas_nuevas.append(Jugadores(0, Personas[i].Boldness, Personas[i].Vengefulness))
+                Personas_nuevas.append( Jugadores( 0, Personas[i].Competitiveness, Personas[i].Resistance ) )
 
         # print "Lista de buenos (tamano " + str(len(indices_buenos)) + ")"
         # print indices_buenos

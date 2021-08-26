@@ -17,8 +17,8 @@ class Agent():
 # print agents' feature
 def Agent_print(j, Agents):
     print("Score: " + str(Agents[j].Score))
-    print("Boldness: " + str(Agents[j].Boldness))
-    print("Vengefulness: " + str(Agents[j].Vengefulness))
+    print("Boldness: " + str( Agents[j].Competitiveness ) )
+    print("Vengefulness: " + str( Agents[j].Resistance ) )
 
 # Norm Game
 def Iteration(Agents):
@@ -27,14 +27,14 @@ def Iteration(Agents):
         # 我们给每个居民4次不符合标准的机会
         for k in range(0, 4):
             s = random.uniform(0, 1)
-            b = Agents[u].Boldness
+            b = Agents[u].Competitiveness
             if s < b:
                 Agents[u].Score += 3
                 next_Agents.append(0)
                 for y in range(len(Agents)):
                     if y != u:
                         Agents[y].Score += -1
-                        if s < Agents[y].Vengefulness:
+                        if s < Agents[y].Resistance:
                             Agents[u].Score += -9
                             Agents[y].Score += -2
             else:
@@ -67,8 +67,8 @@ def Experimento():
 
         Scores.append([u.Score for u in Agents])
         # print "i: " + str(y) + " Scores: ", Scores
-        Boldness_1.append( [u.Boldness for u in Agents] )
-        Vengefulness_1.append( [u.Vengefulness for u in Agents] )
+        Boldness_1.append( [u.Competitiveness for u in Agents] )
+        Vengefulness_1.append( [u.Resistance for u in Agents] )
         next_Agents_1.append( aux ) # Norm
 
         # 找到分数的平均值及其标准偏差
@@ -84,10 +84,10 @@ def Experimento():
         for i in range(len(Agents)):
             x = (Agents[i].Score - M) / std_deviation
             if Agents[i].Score >= M + 1 * std_deviation:
-                new_agents.append(Agent(0, Agents[i].Boldness, Agents[i].Vengefulness))
-                new_agents.append(Agent( 0, Agents[i].Boldness, Agents[i].Vengefulness ) )
+                new_agents.append( Agent( 0, Agents[i].Competitiveness, Agents[i].Resistance ) )
+                new_agents.append( Agent( 0, Agents[i].Competitiveness, Agents[i].Resistance ) )
             elif Agents[i].Score >= M and Agents[i].Score < M + 1 * std_deviation:
-                new_agents.append(Agent(0, Agents[i].Boldness, Agents[i].Vengefulness))
+                new_agents.append( Agent( 0, Agents[i].Competitiveness, Agents[i].Resistance ) )
 
         # 根据好人和普通人的后代创建一个新的列表
         # 打印“新员工人数：”+str（len（新员工））

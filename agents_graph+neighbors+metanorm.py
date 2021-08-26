@@ -62,21 +62,40 @@ def Agent_print(j, Agents):
 def Norm_Game(Agents):
     # 遍历整个Agent的list
     N = NumAgent
+    deserter = []
     for u in range(len(Agents)):
         # 随机为score赋值
-        s = random.uniform(0, 1)
+        prob = random.uniform(0, 1)
         # Boldness是天生的
-        b = Agents[u].Competitiveness
-        if s < b:
+        compete = Agents[u].Competitiveness
+        if prob < compete:
             Agents[u].Score += 5 / N
             for y in range(len(Agents)):
                 # only can be seen by their neighbors
                 if y != u and Agents[y].Neighbors == Agents[u].Neighbors:
                     Agents[y].Score += -1 / N
-                    if s < Agents[y].Resistance:
+                    if prob < Agents[y].Resistance:
                         # Agents[u].Score += -3.75 / N
                         Agents[u].Score += -4.8 / N
                         Agents[y].Score += -1 / N
+                    else:
+                        deserter.append(y)
+    return Agents, deserter
+
+def Metanorm(Agents, deserter):
+    N = NumAgent
+    for u in deserter:
+        # 随机为score赋值
+        prob = random.uniform(0, 1)
+        # Boldness是天生的
+        compete = Agents[u].Competitiveness
+        if prob < 0.5:
+            for y in range(len(Agents)):
+                # only can be seen by their neighbors
+                if y != u and Agents[y].Neighbors == Agents[u].Neighbors and prob < Agents[y].Resistance:
+                    # Agents[u].Score += -3.75 / N
+                    Agents[u].Score += -4.8 / N
+                    Agents[y].Score += -1 / N
     return Agents
 
 def Iteration(Agents, epoch):
@@ -91,7 +110,8 @@ def Iteration(Agents, epoch):
     print("运行迭代中...")
     for y in range(0, epoch):
 
-        next_Agents = Norm_Game(Agents)
+        Agents, deserter = Norm_Game(Agents)
+        next_Agents = Metanorm(Agents, deserter)
 
         Scores.append([u.Score for u in next_Agents])
         # print "i: " + str(y) + " Scores: ", Scores
@@ -169,7 +189,9 @@ for i in range(NumExp):
     for j in range(len(Agents)):
         Agent_print(j, Agents)
     # 3. Norm Game
-    Agents = Norm_Game(Agents)
+    Agents, deserter = Norm_Game(Agents)
+    # 3+. Metanorm
+    Agents = Metanorm(Agents, deserter)
     # 4. Iteration
     Scores, Boldness_1, Vengefulness_1, Neighbors, Agents = Iteration(Agents, epoch)
     # 读取最后一次迭代后的Agent的Boldness和Vengefulness

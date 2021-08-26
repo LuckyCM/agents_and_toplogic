@@ -32,8 +32,8 @@ def Generate_agent(NumAgent):
 # print agents' feature
 def Agent_print(j, Agents):
     print("Score: " + str(Agents[j].Score))
-    print("Boldness: " + str(Agents[j].Boldness))
-    print("Vengefulness: " + str(Agents[j].Vengefulness))
+    print("Boldness: " + str( Agents[j].Competitiveness ) )
+    print("Vengefulness: " + str( Agents[j].Resistance ) )
     # print("Neigbhors: " + str(Agents[j].Neighbors))
 
 # Norm Game
@@ -43,13 +43,13 @@ def Norm_Game(Agents):
         # 随机为score赋值
         s = random.uniform(0, 1)
         # Boldness是天生的
-        b = Agents[u].Boldness
+        b = Agents[u].Competitiveness
         if s < b:
             Agents[u].Score += 3
             for y in range(len(Agents)):
                 if y != u:
                     Agents[y].Score += -1
-                    if s < Agents[y].Vengefulness:
+                    if s < Agents[y].Resistance:
                         Agents[u].Score += -9
                         Agents[y].Score += -2
     return Agents
@@ -70,8 +70,8 @@ def Iteration(Agents, epoch):
 
         Scores.append([u.Score for u in next_Agents])
         # print "i: " + str(y) + " Scores: ", Scores
-        Boldness.append([u.Boldness for u in next_Agents])
-        Vengefulness.append([u.Vengefulness for u in next_Agents])
+        Boldness.append( [u.Competitiveness for u in next_Agents] )
+        Vengefulness.append( [u.Resistance for u in next_Agents] )
 
         # 找到分数的平均值及其标准偏差
         M = np.mean(Scores[0])
@@ -89,13 +89,13 @@ def Iteration(Agents, epoch):
                 # new_agents.append(Agent(0, next_Agents[i].Boldness, next_Agents[i].Vengefulness, next_Agents[i].Neighbors))
                 # new_agents.append(Agent(0, next_Agents[i].Boldness, next_Agents[i].Vengefulness, next_Agents[i].Neighbors))
                 new_agents.append(
-                    Agent( 0, next_Agents[i].Boldness, next_Agents[i].Vengefulness) )
+                    Agent( 0, next_Agents[i].Competitiveness, next_Agents[i].Resistance ) )
                 new_agents.append(
-                    Agent( 0, next_Agents[i].Boldness, next_Agents[i].Vengefulness) )
+                    Agent( 0, next_Agents[i].Competitiveness, next_Agents[i].Resistance ) )
             elif scaler * std_deviation > 0 and scaler < 1:
-                new_agents.append(Agent(0, next_Agents[i].Boldness, next_Agents[i].Vengefulness))
+                new_agents.append( Agent( 0, next_Agents[i].Competitiveness, next_Agents[i].Resistance ) )
             else:
-                abondoned_agent.append(Agent(0, next_Agents[i].Boldness, next_Agents[i].Vengefulness))
+                abondoned_agent.append( Agent( 0, next_Agents[i].Competitiveness, next_Agents[i].Resistance ) )
         # 根据好人和普通人的后代创建一个新的列表
         # 打印“新员工人数：”+str（len（新员工））
         if len(new_agents) <= NumAgent:
@@ -127,8 +127,8 @@ def Mutation(Agents):
             Veng = randint( 0, 7 )
             Prob_Veng = Veng / 7
 
-            Agents[i].Boldness = Prob_Bold
-            Agents[i].Vengefulness = Prob_Veng
+            Agents[i].Competitiveness = Prob_Bold
+            Agents[i].Resistance = Prob_Veng
 
 # 模型参数
 NumExp = 10
