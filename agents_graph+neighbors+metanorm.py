@@ -4,8 +4,8 @@ import random
 import datetime
 import numpy as np
 
-# random.seed(2)
-random.seed(1031)
+random.seed(2)
+# random.seed(1031)
 
 class Toplogic():
     def __init__(self, Age, Industry):
@@ -75,8 +75,9 @@ def Norm_Game(Agents):
                 if y != u and Agents[y].Neighbors == Agents[u].Neighbors:
                     Agents[y].Score += -1 / N
                     if prob < Agents[y].Resistance:
-                        # Agents[u].Score += -3.75 / N
-                        Agents[u].Score += -4.8 / N
+                        # Agents[u].Score += -4.8 / N
+                        # Agents[u].Score += -0.05 / N
+                        Agents[u].Score += -0.45 / N
                         Agents[y].Score += -1 / N
                     else:
                         deserter.append(y)
@@ -93,8 +94,8 @@ def Metanorm(Agents, deserter):
             for y in range(len(Agents)):
                 # only can be seen by their neighbors
                 if y != u and Agents[y].Neighbors == Agents[u].Neighbors and prob < Agents[y].Resistance:
-                    # Agents[u].Score += -3.75 / N
-                    Agents[u].Score += -4.8 / N
+                    # Agents[u].Score += -4.8 / N
+                    Agents[u].Score += -5 / N
                     Agents[y].Score += -1 / N
     return Agents
 
@@ -166,7 +167,7 @@ def Mutation(Agents):
             Agents[i].Resistance = Prob_Resistance
 
 # 模型参数
-NumExp = 1000
+NumExp = 200
 epoch = 1000
 NumAgent = 25
 
@@ -211,8 +212,8 @@ for i in range(NumExp):
 
 # Axelrod 基本图
 fig, ax = plt.subplots()
-plt.xlabel("Boldness")
-plt.ylabel("Vengefulness")
+plt.xlabel("Competitiveness")
+plt.ylabel("Resistance")
 plt.title('Norm Game Dynamics')
 plt.ylim([0.0, 1.0])
 plt.xlim([0.0, 1.0])
@@ -249,16 +250,16 @@ plt.title( "Average Score in each epoch" )
 plt.xlabel( "Time" )
 plt.ylabel( "Value" )
 plt.legend()
-# plt.yticks([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1] )
+# plt.yticks([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
 plt.xlim( [0.0, epoch] )
 plt.savefig( "Average Score" )
 plt.show()
 
 fig, ax = plt.subplots()
-ax.plot(z, color='grey', label='Boldness')
-ax.plot(y, color='black', label='Vengefulness')
-
-plt.xlabel("Time")
+ax.plot(z, color='green', label='Competitiveness')
+ax.plot(y, color='purple', label='Resistance')
+plt.title('Average C and R in each epoch')
+plt.xlabel("Epoch")
 plt.ylabel("Value")
 plt.legend()
 plt.ylim([0.0, 1.0])

@@ -74,8 +74,8 @@ def Norm_Game(Agents):
                 if y != u and Agents[y].Neighbors == Agents[u].Neighbors:
                     Agents[y].Score += -1 / N
                     if s < Agents[y].Resistance:
-                        # Agents[u].Score += -3.75 / N
-                        Agents[u].Score += -4.8 / N
+                        Agents[u].Score += -1.5 / N
+                        # Agents[u].Score += -4.8 / N
                         Agents[y].Score += -1 / N
     return Agents
 
@@ -146,7 +146,7 @@ def Mutation(Agents):
             Agents[i].Resistance = Prob_Resistance
 
 # 模型参数
-NumExp = 1000
+NumExp = 200
 epoch = 1000
 NumAgent = 25
 
@@ -189,8 +189,8 @@ for i in range(NumExp):
 
 # Axelrod 基本图
 fig, ax = plt.subplots()
-plt.xlabel("Boldness")
-plt.ylabel("Vengefulness")
+plt.xlabel("Competitiveness")
+plt.ylabel("Resistance")
 plt.title('Norm Game Dynamics')
 plt.ylim([0.0, 1.0])
 plt.xlim([0.0, 1.0])
@@ -233,8 +233,8 @@ plt.savefig( "Average Score" )
 plt.show()
 
 fig, ax = plt.subplots()
-ax.plot(z, color='grey', label='Boldness')
-ax.plot(y, color='black', label='Vengefulness')
+ax.plot(z, color='grey', label='Competitiveness')
+ax.plot(y, color='black', label='Resistance')
 
 plt.xlabel("Time")
 plt.ylabel("Value")
