@@ -78,12 +78,12 @@ def Norm_Game(Agents):
                         # only can be seen by their neighbors
                         if y != u:
                             if Agents[y].Neighbors[i].Age == Agents[u].Neighbors[j].Age or \
-                                Agents[y].Neighbors[i].Age == Agents[u].Neighbors[j].Age:
+                                Agents[y].Neighbors[i].Industry == Agents[u].Neighbors[j].Industry:
                                 Agents[y].Score += -1 / N
                                 if prob < Agents[y].Resistance:
-                                    # Agents[u].Score += -4.8 / N
+                                    Agents[u].Score += -4.8 / N
                                     # Agents[u].Score += -0.05 / N
-                                    Agents[u].Score += -0.45 / N
+                                    # Agents[u].Score += -0.45 / N
                                     Agents[y].Score += -1 / N
                                 else:
                                     deserter.append(y)
@@ -99,10 +99,14 @@ def Metanorm(Agents, deserter):
         if prob < 0.5:
             for y in range(len(Agents)):
                 # only can be seen by their neighbors
-                if y != u and Agents[y].Neighbors == Agents[u].Neighbors and prob < Agents[y].Resistance:
-                    # Agents[u].Score += -4.8 / N
-                    Agents[u].Score += -5 / N
-                    Agents[y].Score += -1 / N
+                c = tuple(set( Agents[y].Neighbors ) & set( Agents[u].Neighbors ))
+                if y != u and prob < Agents[y].Resistance:
+                    if [c[i].Age for i in range( len( c ) )] == [Agents[y].Neighbors[j].Age for j in range( len( Agents[y].Neighbors ) )] \
+                        or [c[i].Industry for i in range( len( c ) )] == [Agents[y].Neighbors[j].Industry for j in range( len( Agents[y].Neighbors ) )]:
+                        # Agents[u].Score += -4.8 / N
+                        Agents[u].Score += -5 / N
+                        # [c[i].Score for i in range(len(c))] += -5 / N
+                        Agents[y].Score += -1 / N
     return Agents
 
 def Iteration(Agents, epoch):
@@ -173,7 +177,8 @@ def Mutation(Agents):
             Agents[i].Resistance = Prob_Resistance
 
 # 模型参数
-NumExp = 200
+# NumExp = 200
+NumExp = 10
 epoch = 1000
 NumAgent = 25
 
@@ -192,9 +197,9 @@ for i in range(NumExp):
     Network = Find_Neighbors(NumAgent)
     # 1+. Generate agent
     Agents = Generate_agent(Network)
-    # 2. Print Agents
-    for j in range(len(Agents)):
-        Agent_print(j, Agents)
+    # # 2. Print Agents
+    # for j in range(len(Agents)):
+    #     Agent_print(j, Agents)
     # 3. Norm Game
     Agents, deserter = Norm_Game(Agents)
     # 3+. Metanorm
@@ -255,7 +260,7 @@ plt.xlabel( "Time" )
 plt.ylabel( "Value" )
 plt.legend()
 # plt.yticks([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
-plt.xlim( [0.0, epoch] )
+# plt.xlim( [0.0, epoch] )
 plt.savefig( "Average Score" )
 plt.show()
 
@@ -269,7 +274,7 @@ plt.ylabel("Value")
 plt.legend()
 plt.ylim([0.0, 1.0])
 plt.yticks([0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1])
-plt.xlim([0.0, epoch])
+# plt.xlim([0.0, NumExp])
 plt.savefig("Norm Game")
 plt.show()
 
