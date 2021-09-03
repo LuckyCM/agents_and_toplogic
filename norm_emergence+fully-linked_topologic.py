@@ -54,9 +54,8 @@ def Generate_agent(Network):
 # print agents' feature
 def Agent_print(j, Agents):
     print("Score: " + str(Agents[j].Score))
-    print("Boldness: " + str( Agents[j].Competitiveness ) )
-    print("Vengefulness: " + str( Agents[j].Resistance ) )
-    print("Neighbors: " + str(Agents[j].Neighbors))
+    print("Competitiveness: " + str( Agents[j].Competitiveness ) )
+    print("Resistance: " + str( Agents[j].Resistance ) )
 
 # Norm Game
 def Norm_Game(Agents):
@@ -74,8 +73,8 @@ def Norm_Game(Agents):
                 if y != u and Agents[y].Neighbors == Agents[u].Neighbors:
                     Agents[y].Score += -1 / N
                     if s < Agents[y].Resistance:
-                        Agents[u].Score += -1.5 / N
-                        # Agents[u].Score += -4.8 / N
+                        # Agents[u].Score += -1.5 / N
+                        Agents[u].Score += -3 / N
                         Agents[y].Score += -1 / N
     return Agents
 
@@ -146,7 +145,7 @@ def Mutation(Agents):
             Agents[i].Resistance = Prob_Resistance
 
 # 模型参数
-NumExp = 200
+NumExp = 100
 epoch = 1000
 NumAgent = 25
 
@@ -194,7 +193,7 @@ plt.ylabel("Resistance")
 plt.title('Norm Game Dynamics')
 plt.ylim([0.0, 1.0])
 plt.xlim([0.0, 1.0])
-plt.plot([np.mean(u) for u in Vengefulness_end], [np.mean(u) for u in Boldness_end], 'D', c='blue')
+plt.plot([np.mean(u) for u in Boldness_end], [np.mean(u) for u in Vengefulness_end], 'D', c='blue')
 plt.savefig("Norm_Game_Dynamics.png")
 plt.show()
 
@@ -233,8 +232,8 @@ plt.savefig( "Average Score" )
 plt.show()
 
 fig, ax = plt.subplots()
-ax.plot(z, color='grey', label='Competitiveness')
-ax.plot(y, color='black', label='Resistance')
+ax.plot(z, color='green', label='Competitiveness')
+ax.plot(y, color='purple', label='Resistance')
 
 plt.xlabel("Time")
 plt.ylabel("Value")

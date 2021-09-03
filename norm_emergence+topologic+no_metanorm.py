@@ -1,11 +1,9 @@
 from random import uniform, randint
 import matplotlib.pyplot as plt
 import random
-import datetime
 import numpy as np
 
 random.seed(2)
-# random.seed(1031)
 
 class Toplogic():
     def __init__(self, Age, Industry):
@@ -21,14 +19,15 @@ class Agent():
 
 def Find_Neighbors(NumAgent):
     Network = []
-    # 初始NumAgent人口
+    # Initialize the population according to NumAgent
     for i in range(0, NumAgent):
 
-        # 假设研究20-70岁的工作者
+        #  Suppose we want to study workers aged 20-70 and divide them into age groups
         Age = randint(20, 70)
         Age_Group = int((Age - 20) / 10)
 
-        # 假设有5个职业(计算机，医生，律师，教师，农民)
+        # Suppose there are five occupations
+        # (representing computer, doctor, lawyer, teacher and farmer respectively)
         Industry = randint(0, 4)
 
         Network.append(Toplogic(Age_Group, Industry))
@@ -37,51 +36,49 @@ def Find_Neighbors(NumAgent):
 def Generate_agent(Network):
     Agents = []
     Neighbors = []
-    # 每个agent有一个随机的boldness和vengefulness
+    # Each Agent has a random value of boldness and vengefulness
     for i in range(len(Network)):
-        Competitive = randint( 0, 7 )
-        Prob_Competitive = Competitive / 7
+        Competitive = randint( 0, 1000 )
+        Prob_Competitive = Competitive / 1000
 
-        Resistence = randint( 0, 7 )
-        Prob_Resistence = Resistence / 7
+        Resistence = randint( 0, 1000 )
+        Prob_Resistence = Resistence / 1000
 
         for j in range(len(Network)):
             if Network[j].Age == Network[i].Age or Network[j].Industry == Network[i].Industry:
                 Neighbors.append( Network[j] )
         Agents.append(Agent(0, Prob_Competitive, Prob_Resistence, Neighbors))
-        Neighbors = [] # 这里不能用list.clear()
+        Neighbors = [] # Here can not use list.clear()
     return Agents
 
 # print agents' feature
 def Agent_print(j, Agents):
     print("Score: " + str(Agents[j].Score))
-    print("Boldness: " + str( Agents[j].Competitiveness ) )
-    print("Vengefulness: " + str( Agents[j].Resistance ) )
+    print("Competitiveness: " + str( Agents[j].Competitiveness ) )
+    print("Resistance: " + str( Agents[j].Resistance ) )
     print("Neighbors: " + str(Agents[j].Neighbors))
 
 # Norm Game
 def Norm_Game(Agents):
-    # 遍历整个Agent的list
+    # Traverse the entire list of Agents
     N = NumAgent
     deserter = []
     for u in range(len(Agents)):
-        # 随机为score赋值
+        # randomly initialise probability
         prob = random.uniform(0, 1)
-        # Boldness是天生的
         compete = Agents[u].Competitiveness
         if prob < compete:
-            Agents[u].Score += 5 / N
+            Agents[u].Score += -5 / N
             for y in range(len(Agents)):
-                # 寻找neighbors中的相同值
+                # Search the same value in neighbors
                 for i in range( len( Agents[y].Neighbors ) ):
                     for j in range( len( Agents[u].Neighbors ) ):
                         # only can be seen by their neighbors
                         if y != u:
                             if Agents[y].Neighbors[i].Age == Agents[u].Neighbors[j].Age or \
                                 Agents[y].Neighbors[i].Industry == Agents[u].Neighbors[j].Industry:
-                                Agents[y].Score += -1 / N
                                 if prob < Agents[y].Resistance:
-                                    Agents[u].Score += -4.8 / N
+                                    Agents[u].Score += -1 / N
                                     # Agents[u].Score += -0.05 / N
                                     # Agents[u].Score += -0.45 / N
                                     Agents[y].Score += -1 / N
@@ -92,9 +89,7 @@ def Norm_Game(Agents):
 def Metanorm(Agents, deserter):
     N = NumAgent
     for u in deserter:
-        # 随机为score赋值
         prob = random.uniform(0, 1)
-        # Boldness是天生的
         compete = Agents[u].Competitiveness
         if prob < 0.5:
             for y in range(len(Agents)):
@@ -104,42 +99,38 @@ def Metanorm(Agents, deserter):
                     if [c[i].Age for i in range( len( c ) )] == [Agents[y].Neighbors[j].Age for j in range( len( Agents[y].Neighbors ) )] \
                         or [c[i].Industry for i in range( len( c ) )] == [Agents[y].Neighbors[j].Industry for j in range( len( Agents[y].Neighbors ) )]:
                         # Agents[u].Score += -4.8 / N
-                        Agents[u].Score += -5 / N
+                        Agents[u].Score += -10 / N
                         # [c[i].Score for i in range(len(c))] += -5 / N
                         Agents[y].Score += -1 / N
     return Agents
 
 def Iteration(Agents, epoch):
     # Initiate the parameter
-    next_Agents = []
-
     Scores = []
-    Boldness = []
-    Vengefulness = []
+    Competitiveness = []
+    Resistance = []
     Neighbors = []
-    # 迭代100次
-    print("运行迭代中...")
+    # 1000 times loop
+    print("Running iteration...")
     for y in range(0, epoch):
 
         Agents, deserter = Norm_Game(Agents)
-        next_Agents = Metanorm(Agents, deserter)
-
+        # next_Agents = Metanorm(Agents, deserter)
+        next_Agents = Agents
         Scores.append([u.Score for u in next_Agents])
         # print "i: " + str(y) + " Scores: ", Scores
-        Boldness.append( [u.Competitiveness for u in next_Agents] )
-        Vengefulness.append( [u.Resistance for u in next_Agents] )
+        Competitiveness.append([u.Competitiveness for u in next_Agents] )
+        Resistance.append( [u.Resistance for u in next_Agents] )
         Neighbors.append([u.Neighbors for u in next_Agents])
-        # 找到分数的平均值及其标准偏差
+        # Find the mean of the scores and their standard deviation
         M = np.mean(Scores[0])
-        # print("mean:", str(M))
         std_deviation = np.std(Scores[0])
-        # print("std_deviation:", str(std_deviation))
 
         # Norm happens here!
         new_agents = []  # create new agents list
         abondoned_agent = []
         for i in range(len(Agents)):
-            # StandardScaler: 所有数据都聚集在0附近，方差为1
+            # StandardScaler: All data are clustered around 0, and the variance is 1
             scaler = (next_Agents[i].Score - M) / std_deviation
             if scaler >= 1:
                 new_agents.append( Agent( 0, next_Agents[i].Competitiveness, next_Agents[i].Resistance, next_Agents[i].Neighbors ) )
@@ -153,72 +144,71 @@ def Iteration(Agents, epoch):
             Agents = new_agents
             Num_rest_Agents = NumAgent - len(Agents)
             # randomly create the rest of the Agents
-            nn = Find_Neighbors(Num_rest_Agents)
-            Generate_agent(nn)
+            for i in range( Num_rest_Agents ):
+                nn = Find_Neighbors( 1 )
+                Agents.extend( Generate_agent( nn ) )
         else:
             # if the Agents' size is out of the len(Agents), cut off the last the Agents' list
-            next_Agents = new_agents[:NumAgent]
+            Agents = new_agents[:NumAgent]
 
         Mutation(Agents)
-    return Scores, Boldness, Vengefulness, Neighbors, next_Agents
+
+    return Scores, Competitiveness, Resistance, Neighbors, Agents
+    # return Scores[-1], Competitiveness[-1], Resistance[-1], Neighbors[-1], Agents
 
 def Mutation(Agents):
-    # 突变
+    # mutation is according to a very small probability
     for i in range(len(Agents)):
         mutation = uniform(0, 1)
         if mutation < 0.01:
-            Competitiveness = randint( 0, 7 )
-            Prob_Competitiveness = Competitiveness / 7
+            Competitiveness = randint( 0, 1000 )
+            Prob_Competitiveness = Competitiveness / 1000
 
-            Resistance = randint( 0, 7 )
-            Prob_Resistance = Resistance / 7
+            Resistance = randint( 0, 1000 )
+            Prob_Resistance = Resistance / 1000
 
             Agents[i].Competitiveness = Prob_Competitiveness
             Agents[i].Resistance = Prob_Resistance
 
-# 模型参数
+#################
+# Hyperparamter
 # NumExp = 200
-NumExp = 10
+NumExp = 50
 epoch = 1000
 NumAgent = 25
 
-#################
 X = []
 Y = []
 Z = []
-U = []
-Boldness_end = []
-Vengefulness_end = []
-
-# 这是一个循环
+Competitiveness_end = []
+Resistance_end = []
+# 1. Find Neighbors
+Network = Find_Neighbors(NumAgent)
+# 1+. Generate agent
+Agents = Generate_agent(Network)
+# external loops
 for i in range(NumExp):
-    print("This is the " + str(i) + "round...")
-    # 1. Find Neighbors
-    Network = Find_Neighbors(NumAgent)
-    # 1+. Generate agent
-    Agents = Generate_agent(Network)
+    print("This is the " + str(i+1) + " round...")
     # # 2. Print Agents
     # for j in range(len(Agents)):
     #     Agent_print(j, Agents)
     # 3. Norm Game
-    Agents, deserter = Norm_Game(Agents)
+    # Agents, deserter = Norm_Game(Agents)
     # 3+. Metanorm
-    Agents = Metanorm(Agents, deserter)
+    # Agents = Metanorm(Agents, deserter)
     # 4. Iteration
     Scores, Competitiveness_iter, Resistance_iter, Neighbors, Agents = Iteration( Agents, epoch )
-    # 读取最后一次迭代后的Agent的Boldness和Vengefulness
-    Boldness_end.append( Competitiveness_iter[len( Competitiveness_iter ) - 1] )
-    Vengefulness_end.append( Resistance_iter[len( Resistance_iter ) - 1] )
+    # Read the Competitiveness and Resistance of the agent after the last iteration
+    Competitiveness_end.append( Competitiveness_iter[-1] )
+    Resistance_end.append( Resistance_iter[-1] )
     x = [np.mean(u) for u in Scores]
-    y = [np.mean(u) for u in Competitiveness_iter]
-    z = [np.mean(u) for u in Resistance_iter]
-    # u = [np.mean(u) for u in Agents]
     X.append(x)
+    y = [np.mean(u) for u in Competitiveness_iter]
     Y.append(y)
+    z = [np.mean(u) for u in Resistance_iter]
     Z.append(z)
-    # U.append(u)
 
-
+# Print Figure
 # Norm Game Dynamics
 fig, ax = plt.subplots()
 plt.xlabel("Competitiveness")
@@ -226,56 +216,58 @@ plt.ylabel("Resistance")
 plt.title('Norm Game Dynamics')
 plt.ylim([0.0, 1.0])
 plt.xlim([0.0, 1.0])
-plt.plot([np.mean(u) for u in Vengefulness_end], [np.mean(u) for u in Boldness_end], 'D', c='blue')
+plt.plot( [np.mean(u) for u in Competitiveness_end], [np.mean(u) for u in Resistance_end], 'D', c='blue' )
 plt.savefig("Norm_Game_Dynamics.png")
 plt.show()
 
 # Find mean
-x = []
-for i in range(epoch):
-    gen = [e[i] for e in X]
-    x.append(np.mean(gen))
+S = []
+C = []
+R = []
+for i in range(0, epoch):
+    s = [e[i] for e in X]
+    c = [e[i] for e in Y]
+    r = [e[i] for e in Z]
+    S.append( np.mean( s ) )
+    C.append( np.mean( c ) )
+    R.append(np.mean(r))
 
-y = []
-for i in range(epoch):
-    gen = [e[i] for e in Y]
-    y.append( np.mean( gen ) )
-
-z = []
-for i in range(epoch):
-    gen = [e[i] for e in Z]
-    z.append(np.mean(gen))
-
-u = []
-for i in range(epoch):
-    gen = [e[i] for e in U]
-    u.append(np.mean(gen))
-
-##
 # Average Score
 fig, ax = plt.subplots()
-ax.plot( x, color='red', label='mean' )
-plt.title( "Average Score in each epoch" )
+ax.plot( S, color='red', label='Score' )
 plt.xlabel( "Time" )
 plt.ylabel( "Value" )
 plt.legend()
-# plt.yticks([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
-# plt.xlim( [0.0, epoch] )
-plt.savefig( "Average Score" )
+plt.xlim( [0.0, epoch] )
+plt.title( "Average Score in each epoch" )
+# plt.savefig( "Average Score" )
 plt.show()
 
 # Average Competitiveness and Resistance in each epoch
 fig, ax = plt.subplots()
-ax.plot(z, color='green', label='Competitiveness')
-ax.plot(y, color='purple', label='Resistance')
+ax.plot(C, color='green', label='Competitiveness')
+ax.plot(R, color='purple', label='Resistance')
 plt.title('Average C and R in each epoch')
 plt.xlabel("Epoch")
 plt.ylabel("Value")
 plt.legend()
 plt.ylim([0.0, 1.0])
 plt.yticks([0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1])
-# plt.xlim([0.0, NumExp])
+plt.xlim([0.0, epoch*NumExp])
 plt.savefig("Norm Game")
 plt.show()
 
-print("Figure Generating...")
+a = [np.mean(Y[i]) for i in range(NumExp)]
+b = [np.mean(Z[i]) for i in range(NumExp)]
+c = [np.mean(X[i]) for i in range(NumExp)]
+
+fig, ax = plt.subplots()
+ax.plot(c, color='red', label='Score')
+plt.title('Average S in each epoch')
+plt.xlabel("NumExp")
+plt.ylabel("Value")
+plt.legend()
+plt.xlim([0.0, NumExp])
+plt.show()
+
+print("Figure Generated Successfully!")
